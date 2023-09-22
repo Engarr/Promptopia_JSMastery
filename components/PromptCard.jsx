@@ -5,7 +5,13 @@ import Image from 'next/image';
 import { useSession } from 'next-auth/react';
 import { usePathname, useRouter } from 'next/navigation';
 
-const PromptCard = ({ prompt, handleEdit, handleDelete, handleTagClick }) => {
+const PromptCard = ({
+  id,
+  prompt,
+  handleEdit,
+  handleDelete,
+  handleTagClick,
+}) => {
   const { data: session } = useSession();
   const pathName = usePathname();
   const router = useRouter();
@@ -70,6 +76,22 @@ const PromptCard = ({ prompt, handleEdit, handleDelete, handleTagClick }) => {
         onClick={() => handleTagClick && handleTagClick(prompt.tag)}>
         #{prompt.tag}
       </p>
+      {session?.user.id === prompt.creator._id && pathName === '/profile' && (
+        <div
+          className='w-full flex-center mt-5 gap-4 border-t border-grey-100 pt-3
+        '>
+          <p
+            className='font-inter text-sm green_gradient cursor-pointer font-bold mr-2'
+            onClick={() => handleEdit(id)}>
+            Edit
+          </p>
+          <p
+            className='font-inter text-sm orange_gradient cursor-pointer font-bold'
+            onClick={() => handleDelete(id)}>
+            Delete
+          </p>
+        </div>
+      )}
     </div>
   );
 };
