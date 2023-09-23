@@ -1,7 +1,15 @@
+'use client';
+
 import Feed from '@components/Feed';
+import { motion } from 'framer-motion';
+import { Suspense } from 'react';
+import Loading from './loading';
 
 const Home = () => (
-  <section className='w-full flex-center flex-col'>
+  <motion.section
+    className='w-full flex-center flex-col'
+    initial={{ opacity: 0, y: 100 }}
+    animate={{ opacity: 1, y: 0 }}>
     <h1 className='head_text text-center'>
       Discover & Share
       <br className='min-md:hidden' />
@@ -11,9 +19,10 @@ const Home = () => (
       Promptopia is an open-source AI prompting tool for modern world to
       discover, create and share creative prompts
     </p>
-
-    <Feed />
-  </section>
+    <Suspense fallback={<Loading />}>
+      <Feed />
+    </Suspense>
+  </motion.section>
 );
 
 export default Home;

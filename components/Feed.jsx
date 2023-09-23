@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import PropmtCard from './PromptCard';
+import { motion } from 'framer-motion';
+import Loading from '@app/loading';
 
 const PropmtCardList = ({ data, handleTagClick }) => {
   return (
@@ -19,19 +21,49 @@ const PropmtCardList = ({ data, handleTagClick }) => {
 
 const Feed = () => {
   const [searchText, setSearchText] = useState('');
-  const [prompts, setPrompts] = useState([]);
+  const [allPrompts, setAllPrompts] = useState([]);
+  const [searchTimeout, setSearchTimeout] = useState(null);
+
+  const [searchResult, setSearchResult] = useState([]);
+
+  const filterPromptsHandler = (searchText) => {
+    const re = new RegExp(searchText, 'i');
+    return allPrompts.filter(
+      (prompt) =>
+        re.test(prompt.creator.username) ||
+        re.test(prompt.prompt) ||
+        re.test(prompt.tag)
+    );
+  };
+
+  const handleTagClick = (tag) => {
+    setSearchText(tag);
+    const searchResult = filterPromptsHandler(tag);
+    setSearchResult(searchResult);
+  };
+
   const handleSearchChange = (e) => {
+    clearTimeout(searchTimeout);
     setSearchText(e.target.value);
+
+    setSearchTimeout(
+      setTimeout(() => {
+        const searchResult = filterPromptsHandler(e.target.value);
+        setSearchResult(searchResult);
+      }, 500)
+    );
   };
 
   useEffect(() => {
     const fetchPosts = async () => {
+      // await new Promise((resolve) => setTimeout(resolve, 3000));
       const response = await fetch('/api/prompt');
       const data = await response.json();
-      setPrompts(data);
+      setAllPrompts(data);
     };
     fetchPosts();
   }, []);
+
   return (
     <section className='feed'>
       <form className='relative w-full flex-center'>
@@ -43,7 +75,11 @@ const Feed = () => {
           className='search_input peer'
         />
       </form>
-      <PropmtCardList data={prompts} handleTagClick={() => {}} />
+
+      <PropmtCardList
+        data={searchText ? searchResult : allPrompts}
+        handleTagClick={handleTagClick}
+      />
     </section>
   );
 };

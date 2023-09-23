@@ -112,7 +112,7 @@ const Nav = () => {
           </div>
         ) : (
           <>
-            {providers &&
+            {providers ? (
               Object.values(providers).map((provider) => (
                 <button
                   type='button'
@@ -123,7 +123,14 @@ const Nav = () => {
                   className='black_btn'>
                   Sign in
                 </button>
-              ))}
+              ))
+            ) : (
+              <>
+                <button type='button' className='black_btn' disabled>
+                  ...
+                </button>
+              </>
+            )}
           </>
         )}
       </div>
